@@ -1,5 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
+from django.core.mail import send_mail
 from .models import MenuItem, Category, OrderModel
 
 # Create your views here.
@@ -34,7 +35,7 @@ class Order(View):
         email = request.POST.get('email')
         street = request.POST.get('street')
         city = request.POST.get('city')
-        zip_code = request.POST.get('zip_code')
+        zip_code = request.POST.get('zip')
         order_items = {
             'items': []
         }
@@ -68,9 +69,44 @@ class Order(View):
             )
         order.items.add(*item_ids)
 
+        # After the order has been made, send the customer a confirmation email
+        body = ('Thank you for your order. You will receive your food shortly!\n'
+        f'Your total: {price}\n'
+        'Enjoy your food!')
+
+        send_mail(
+            'Thank you for your order',
+            body,
+            'order@deliver.com',
+            [email],
+            fail_silently=False
+        )
+
         context = {
             'items': order_items['items'],
             'price': price
         }
 
+        return redirect('order-confirmation', pk=order.pk)
+
+
+class OrderConfirmation(View):
+    def get(self, request, pk, *args, **kwargs):
+        order = OrderModel.objects.get(pk=pk)
+
+        context = {
+            'pk': order.pk,
+            'items': order.items,
+            'price': order.price,
+        }
+
         return render(request, 'customer/order_confirmation.html', context)
+
+    def post(self, request, pk, *args, **kwargs):
+        print(request.body)
+        return redirect('payment-confirmation')
+
+
+class OrderPayConfirmation(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'customer/order_pay_confirmation.html')
