@@ -133,7 +133,7 @@ class Menu(View):
 
 class MenuSearch(View):
     def get(self, request, *args, **kwargs):
-        query =self.request.GET.get('q')
+        query = self.request.GET.get('q')
         menu_items = MenuItem.objects.filter(
             Q(name__icontains=query) |
             Q(price__icontains=query) |
