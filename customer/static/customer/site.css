@@ -1,0 +1,19 @@
+body {
+    
+    background: rgb(255, 255, 255) url("images/pexels-madison-inouye-1831234.jpg");
+}
+
+.menu-images {
+    width: 350px;
+    height: 300px;
+    object-fit: cover;
+  }
+
+  .order-images{
+    width: 150px;
+    height: 100px;
+    object-fit: cover;
+  }
+
+
+
